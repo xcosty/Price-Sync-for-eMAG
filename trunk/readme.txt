@@ -3,7 +3,7 @@ Contributors: xCosty
 Tags: woocommerce, emag, price sync, stock sync, marketplace
 Requires at least: 4.7
 Tested up to: 6.6
-Stable tag: 1.5.2
+Stable tag: 1.5.1
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -11,9 +11,6 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Sync WooCommerce product prices and stock with eMAG Marketplace, including advanced settings for added functionality.
 
 == Description ==
-
-Stable tag: 1.5.2
-Am eliminat ID Conditions din meniul pluginului si am dus configul in pagina de produs.
 
 Stable tag: 1.5
 Am corectat partea de sincronizare in baza ID-ului si PNK

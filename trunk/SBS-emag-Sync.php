@@ -7,14 +7,43 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Plugin Name: Price Sync for eMAG
  * Description: Sync WooCommerce product prices with eMAG Marketplace and includes advanced settings for added functionality.
- * Version: 1.5.2
+ * Version: 1.5.1
  * Author: xCosty
  * Author URI: https://www.solgarden.ro
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
+/*Funcționalități
+Acest plugin oferă sincronizarea automată a prețurilor și stocurilor produselor din WooCommerce cu eMAG Marketplace, folosind API-ul eMAG. Include și setări avansate care extind funcționalitatea pluginului. Iată ce poate face pluginul:
 
+Sincronizare prețuri și stocuri: Produsele din WooCommerce sunt sincronizate automat cu API-ul eMAG. Pluginul actualizează prețurile și stocurile produselor listate pe eMAG.
+
+Adăugare adaos la prețuri: Setarea "Price Multiplier" permite aplicarea unui adaos procentual la prețurile produselor înainte de a fi trimise către eMAG.
+
+Sincronizare selectivă pe branduri: Utilizatorii pot alege să sincronizeze doar anumite branduri, specificate în secțiunea de setări "Brands to Sync".
+
+Sincronizare stocuri pe branduri: Setarea "Brands with Real Stock" permite selectarea brandurilor care vor trimite stocul real către eMAG. Pentru celelalte branduri, se poate configura o valoare de stoc personalizată.
+
+Maparea personalizată a ID-urilor: Pluginul permite maparea ID-urilor produselor între WooCommerce și eMAG, astfel încât sincronizarea să țină cont de identificatori personalizați, specificați în formatul eMAG_ID=WordPress_ID.
+
+Configurarea unui stoc minim: Setarea "Stock Value for Zero Stock" permite definirea unei valori de stoc minime care va fi transmisă către eMAG în cazul în care stocul produsului este 0 în WooCommerce.
+
+Sincronizare automată periodică: Pluginul folosește un cron job care rulează sincronizarea la fiecare oră. Acest comportament poate fi personalizat în funcție de nevoi.
+
+Opțiuni de logare în debug: Utilizatorii pot activa opțiunea de logare în fișierul debug.log pentru a verifica posibilele erori sau mesaje de eroare trimise de API-ul eMAG.
+
+Interfață de administrare avansată: Setările API eMAG și cele avansate sunt gestionate printr-o interfață dedicată în panoul de administrare WordPress, permițând utilizatorilor să configureze cu ușurință parametrii necesari.
+
+Selectare multiplă pentru branduri: Caseta de selecție a brandurilor este afișată într-o fereastră statică, cu dimensiuni personalizate (300px înălțime și 100% lățime), și permite selecția multiplă de branduri folosind Ctrl sau Shift.
+
+Cum funcționează:
+Sincronizarea prețurilor și stocurilor: Când un produs este creat sau actualizat în WooCommerce, pluginul apelează funcțiile API eMAG pentru a sincroniza prețurile și stocurile cu platforma eMAG. Procesul poate fi declanșat automat și printr-un cron job.
+
+Setări avansate: În secțiunea "Advanced API Settings", utilizatorii pot configura multiplicatorii de preț, condițiile de stoc, brandurile sincronizate și setările de logare.
+
+Interfață și administrare: Pluginul adaugă un meniu în secțiunea de setări din WordPress, unde utilizatorii pot introduce detalii de autentificare API (username, password, URL de bază) și să personalizeze comportamentul sincronizării.
+*/
 
 // Adăugăm un meniu de setări în panoul de administrare WordPress
 add_action('admin_menu', 'weps_add_admin_menu');
@@ -160,7 +189,13 @@ function sanitize_weps_advanced_settings($input) {
         'weps_advanced_pluginPage_section'
     );
 
-    
+    add_settings_field(
+        'weps_id_conditions',
+        __('ID Conditions', 'price-sync-for-emag'),
+        'weps_id_conditions_render',
+        'advancedPluginPage',
+        'weps_advanced_pluginPage_section'
+    );
 }
 
 function weps_username_render() { 
@@ -249,7 +284,13 @@ function weps_debug_logging_render() {
     <?php
 }
 
-
+function weps_id_conditions_render() {
+    $options = get_option('weps_advanced_settings');
+    ?>
+    <textarea name='weps_advanced_settings[weps_id_conditions]'><?php echo esc_textarea($options['weps_id_conditions'] ?? ''); ?></textarea>
+    <p class="description"><?php esc_html_e('Introduceți condițiile ID-urilor în formatul eMAG_ID=WordPress_ID separate prin virgulă.', 'price-sync-for-emag'); ?></p>
+    <?php
+}
 
 function weps_settings_section_callback() { 
     echo esc_html__('Introduceți detaliile API-ului eMAG.', 'price-sync-for-emag');
